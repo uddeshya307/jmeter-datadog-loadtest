@@ -1,0 +1,9 @@
+FROM uddeshya307/jmeter-base:latest
+RUN apt-get clean 
+RUN apt-get update
+RUN apt-get -y install unzip
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+&& unzip awscliv2.zip \
+&& ./aws/install
+WORKDIR /jmeter
+EXPOSE 60000

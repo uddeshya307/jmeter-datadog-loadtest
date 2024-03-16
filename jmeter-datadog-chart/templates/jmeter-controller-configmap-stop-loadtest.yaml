@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jmeter-controller-config-stoptest
+  namespace: {{ .Values.load_test.namespace }}
+  labels:
+    app: jmeter-load-test
+data:
+  stop_load_test: |
+    #!/bin/bash
+    ./apache-jmeter-5.6.3/bin/stoptest.sh

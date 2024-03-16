@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jmeter-controller-config-starttest
+  namespace: {{ .Values.load_test.namespace }}
+  labels:
+    app: jmeter-load-test
+data:
+  start_load_test: |
+    #!/bin/bash
+    /jmeter/apache-jmeter-*/bin/jmeter -n -t $1 -f -Dserver.rmi.ssl.disable=true -Dserver.rmi.port=1099 -Dclient.rmi.localport=60000 -R `getent ahostsv4 jmeter-worker-svc | cut -d' ' -f1 | sort -u | awk -v ORS=, '{print $1}' | sed 's/,$//'` -l result1.csv -e -o {{ .Values.load_test.script }}-htmlreport

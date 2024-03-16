@@ -1,0 +1,12 @@
+# Default values for jmeter-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+  
+load_test:
+  worker_pods: 3
+  script: "test-datadog-listener.jmx"
+  namespace: jmeter-datadog
+
+config:
+  name: jmeter-controller-config-scripts

@@ -1,0 +1,25 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jmeter-worker
+  namespace: {{ .Values.load_test.namespace }}
+  labels:
+    jmeter: worker
+spec:
+  replicas: {{ .Values.load_test.worker_pods }}
+  selector:
+    matchLabels:
+      jmeter: worker
+  template: 
+    metadata:
+      labels:
+        jmeter: worker
+    spec:
+      containers:
+      - name: jmeter-worker-c00
+        image: uddeshya307/jmeter-worker:latest
+        ports:
+        - name: server-rmi-port
+          containerPort: 1099
+        - name: server-rmi-loca
+          containerPort: 50000

@@ -1,0 +1,63 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jmeter-controller
+  namespace: {{ .Values.load_test.namespace }}
+  labels:
+    jmeter: controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      jmeter: controller
+  template:
+    metadata:
+      labels:
+        jmeter: controller
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/jmeter-controller-configmap-start-loadtest.yaml") . | sha256sum }}
+        checksum/config-script: {{ include (print $.Template.BasePath "/jmeter-controller-configmap-scripts.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: jmeter-load-test
+      containers: 
+      - name: jmeter-controller-c00
+        image: uddeshya307/jmeter-controller:latest
+        command: ["/bin/bash","-c"]
+        args: 
+        - >
+          sleep 5 &&
+          /jmeter/start_load_test "/jmeter/{{ .Values.load_test.script }}" &&
+          while true;
+          do sleep 40; 
+          done
+        volumeMounts:
+          - name: jmeter-scripts
+            mountPath: /jmeter/{{ .Values.load_test.script }}
+            subPath: "{{ .Values.load_test.script }}"
+          - name: start-load-test
+            mountPath: jmeter/start_load_test
+            subPath: "start_load_test"
+          - name: stop-load-test
+            mountPath: jmeter/stop_load_test
+            subPath: "stop_load_test"
+        env:
+          - name: DATADOG_API_KEYS
+            valueFrom:
+              secretKeyRef:
+                name: datadog-secrets
+                key: api_key   
+        ports:
+        - name: client-rmi-loca
+          containerPort: 60000
+      volumes:
+        - name: jmeter-scripts
+          configMap:
+            name: {{ .Values.config.name }} 
+        - name: start-load-test
+          configMap:
+            name: jmeter-controller-config-starttest
+            defaultMode: 0755
+        - name: stop-load-test
+          configMap:
+            name: jmeter-controller-config-stoptest
+            defaultMode: 0755        

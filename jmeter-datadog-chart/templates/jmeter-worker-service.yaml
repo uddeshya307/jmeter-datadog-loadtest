@@ -1,0 +1,18 @@
+kind: Service 
+apiVersion: v1 
+metadata:
+  name: jmeter-worker-svc
+  namespace: {{ .Values.load_test.namespace }}
+  labels:
+    app: worker-service
+spec: 
+  clusterIP: None
+  ports:
+  - port: 1099
+    name: server-rmi-port 
+    targetPort: 1099
+  - port: 50000
+    name: server-rmi-loca
+    targetPort: 50000
+  selector:
+    jmeter: worker
